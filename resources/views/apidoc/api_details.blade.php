@@ -1,65 +1,114 @@
 @extends('app')
 @section('javascript')
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
 @endsection
 @section('css')
+    <link href="{{ asset('/css/code_prettify.css') }}" rel="stylesheet">
+
 @endsection
 @section('content')
+    <?php
 
-    <h2>Api Details for {{$api['url_endpoint']}}</h2>
+    switch($api['method']) {
+        case "PUT":
+            $but_type = "warning";
+            break;
+        case "POST":
+            $but_type = "primary";
+            break;
+        case "DELETE":
+            $but_type = "danger";
+            break;
+        case "GET":
+            $but_type = "success";
+            break;
+        default:
+            $but_type = "default";
+            break;
 
-    {{$api['category']}} : {{$api['name']}} : {{$api['short_code']}}  : {{$api['method']}} : {{$api['url_endpoint']}}
-    <br><br>
-    Description
+    }
+
+
+
+    ?>
+
+
+    <h3><span class="api_category_small">{{$api['category']}}</span>  :: <div class="btn btn-<?php echo $but_type; ?> btn-small"> {{$api['method']}}</div>  <span class="api_title"><?php echo $endpoint; ?></span></h3>
+
+    Function : {{$api['name']}} <br><br>
+
+
+    <h3 class="api_title">Description</h3>
     {{$api['description']}}
     <br><br>
-    Relevant Return Values
-    <br><br>
-    <h3>Parameters</h3>
+    <h3 class="api_title">Parameters</h3>
+
+    @if (count($parameters) === 0)
+
+        No Parameters needed for this function
+
+    @else
+
     <table class="table">
 
         @foreach ($parameters as $param)
 
 <tr>
-    <td>{{$param['name']}}</td>
+    <td class="api_param_name">{{$param['name']}}</td>
+    <td>{{$param['required']}}</td>
     <td>{{$param['type']}}</td>
     <td>{{$param['desc']}}</td>
-    <td>{{$param['max_length']}}</td>
-    <td>{{$param['name']}}</td>
+
+
 </tr>
         @endforeach
 
     </table>
+    @endif
 
 
-    <h3>Exceptions</h3>
+    @if (count($exceptions) > 0)
+    <h3 class="api_title">Exceptions</h3>
+
     <table class="table">
-        <?php for ($a=0;$a<5;$a++)
-        {
-        ?>
+        @foreach ($exceptions as $exception)
         <tr>
             <td>Error Code</td>
             <td>Description</td>
         </tr>
-        <?php
-
-        }
-        ?>
+        @endforeach
     </table>
+    @endif
+
+    <h3 class="api_title">URL Construct</h3>
+    {{$api['example_call_construct']}}
 
 
-    <h3>URL Construct</h3>
-    {{$api['example_url_construct']}}
+    <h3 class="api_title">Example Success</h3>
+
+<pre class=" prettyprint">
+{{$api['json_example_success']}}
+</pre>
 
 
-    <h3>Example Success</h3>
-    <div class="well">
-        {{$api['json_example_success']}}
-    </div>
 
-    <h3>Example Failure</h3>
+    @if ($api['json_example_failure'] != "" )
+    <h3 class="api_title">Example Failure</h3>
     <div class="well">
         {{$api['json_example_failure']}}
     </div>
+
+    @endif
+
+
+
+    @if ($api['json_example_code'] != "" )
+        <h3 class="api_title">Example Client Code</h3>
+<pre class=" prettyprint">
+{{$api['json_example_code']}}
+</pre>
+
+    @endif
 
 
 @endsection

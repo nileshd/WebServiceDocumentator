@@ -1,0 +1,38 @@
+.api_endpoint_small {
+
+    color:#CD5C5C;
+    font-weight: bold;
+}
+
+.api_category_small {
+
+    color:#3CB371;
+    font-weight: bold;
+}
+.api_title {
+
+    color:#4682B4;
+
+}
+.api_endpoint {
+
+    color:#CD5C5C;
+
+}
+
+.api_category {
+
+    color:#3CB371;
+
+}
+
+.api_endpoint_parts {
+
+    color:#B03060;
+
+}
+
+.api_param_name {
+
+    color: #D02090;
+}

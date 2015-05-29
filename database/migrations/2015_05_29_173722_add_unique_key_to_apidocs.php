@@ -14,7 +14,7 @@ class AddUniqueKeyToApidocs extends Migration {
 	{
 		Schema::table('apidocs', function(Blueprint $table)
 		{
-            $table->unique(array('category','api_endpoint'));
+            $table->unique(array('category','api_endpoint','method'));
 		});
 	}
 

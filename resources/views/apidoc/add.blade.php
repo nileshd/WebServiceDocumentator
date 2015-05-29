@@ -35,15 +35,20 @@
         <fieldset>
 
             <!-- Form Name -->
-            <legend>API Details</legend>
+            <legend class="api_title">API Details</legend>
 
             <!-- Select Basic -->
             <div class="form-group">
                 <label class="col-md-3 control-label" for="category">Category</label>
                 <div class="col-md-4">
                     <select id="category" name="category" class="form-control ">
-                        <option>PHLAG</option>
-                        <option>SparePhone</option>
+
+                        @foreach ($categories as $category)
+                            <option>{{$category->asset_id}}</option>
+                        @endforeach
+
+
+
                     </select>
                 </div>
             </div>
@@ -126,7 +131,7 @@
 
 
             <div class="form-group">
-                <legend>API Parameters</legend>
+                <legend class="api_title">API Parameters</legend>
 
                 <table id="mytable" class="table table-condensed">
 
@@ -186,7 +191,7 @@
 
 
             <div class="form-group">
-                <legend>Exceptions</legend>
+                <legend class="api_title">Exceptions</legend>
 
                 <table id="mytableExceptions" class="table table-condensed">
 

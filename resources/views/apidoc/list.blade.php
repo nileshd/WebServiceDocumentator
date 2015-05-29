@@ -53,13 +53,13 @@
             </td>
             <td>
                 <a href="/api/{{$api['id']}}">
-                    {{$api['url_endpoint']}}
+                    <?php echo $api['api_endpoint']; ?>
                 </a>
             </td>
 
             <td>
                 <a href="/api/{{$api['id']}}">
-                    {{$api['name']}} | {{$api['short_code']}}
+                    {{$api['name']}}
                 </a>
             </td>
 
