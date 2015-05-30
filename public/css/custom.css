@@ -20,6 +20,13 @@
 
 }
 
+.ws_output
+{
+    background-color: #000000;
+    color: #ffdddd;
+    height : 600px;
+}
+
 .api_category {
 
     color:#3CB371;

@@ -82,7 +82,10 @@
 
     <h3 class="api_title">URL Construct</h3>
     {{$api['example_call_construct']}}
-
+<br>
+    @foreach ($servers as $server)
+       <strong>{{$server->asset_label}}</strong>  {{$server->asset_id}}{{$api['api_endpoint']}}?token=iamsparefoot&pretty=1  <br>
+    @endforeach
 
     <h3 class="api_title">Example Success</h3>
 

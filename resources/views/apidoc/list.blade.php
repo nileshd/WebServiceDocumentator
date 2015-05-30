@@ -17,7 +17,7 @@
         @foreach ($apis as $api)
             <?php
 
-                switch($api['method']) {
+                switch($api->method) {
                     case "PUT":
                         $but_type = "warning";
                         break;
@@ -43,23 +43,26 @@
 
         <tr>
             <td>
-                <a href="/api/category/{{$api['category']}}">
-                    {{$api['category']}}
+                <a href="/api/category/{{$api->category}}">
+                    {{$api->category}}
                 </a>
             </td>
             <td>
 
-                <div class="btn btn-<?php echo $but_type; ?> btn-small"> {{$api['method']}}</div>
+                <div class="btn btn-<?php echo $but_type; ?> btn-small"> {{$api->method}}</div>
+
             </td>
             <td>
-                <a href="/api/{{$api['id']}}">
-                    <?php echo $api['api_endpoint']; ?>
+                <a href="/api/{{$api->id}}">
+                    <?php echo $api->api_endpoint; ?>
                 </a>
+
+                <a href="/api/edit/{{$api->id}}">(E)</a>
             </td>
 
             <td>
-                <a href="/api/{{$api['id']}}">
-                    {{$api['name']}}
+                <a href="/api/{{$api->id}}">
+                    {{$api->name}}
                 </a>
             </td>
 

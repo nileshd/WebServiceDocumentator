@@ -19,6 +19,14 @@
                     });
         });
 
+        $("#addCodeExamples, .check ").click(function() {
+            $('#mytableCodeExamples tbody>tr:last')
+                    .clone(true)
+                    .insertAfter('#mytableCodeExamples tbody>tr:last').find('input').each(function(){
+                        $(this).val('');
+                    });
+        });
+
 
     </script>
 @endsection
@@ -53,6 +61,29 @@
                 </div>
             </div>
 
+
+
+            <!-- Text input-->
+            <div class="form-group required-control">
+                <label class="col-md-3 control-label" for="url_endpoint"><strong>API Endpoint</strong></label>
+                <div class="col-md-8">
+                    <input id="url_endpoint" name="url_endpoint" type="text" placeholder="URL Endpoint" class="form-control " required="">
+                    <p class="help-block">e.g /dog/bark</p>
+                </div>
+            </div>
+
+
+            <!-- Text input-->
+            <div class="form-group required-control">
+                <label class="col-md-3 control-label" for="url_endpoint">API Alias (e.g Cient SDK)</label>
+                <div class="col-md-8">
+                    <input id="alias" name="alias" type="text" placeholder="API Alias" class="form-control " required="">
+
+                </div>
+            </div>
+
+
+
             <!-- Text input-->
             <div class="form-group">
                 <label class="col-md-3 control-label" for="name">Name</label>
@@ -70,24 +101,6 @@
                 </div>
             </div>
 
-            <!-- Text input-->
-            <div class="form-group required-control">
-                <label class="col-md-3 control-label" for="url_endpoint">API Endpoint</label>
-                <div class="col-md-8">
-                    <input id="url_endpoint" name="url_endpoint" type="text" placeholder="URL Endpoint" class="form-control " required="">
-                    <p class="help-block">e.g /dog/bark</p>
-                </div>
-            </div>
-
-
-            <!-- Text input-->
-            <div class="form-group">
-                <label class="col-md-3 control-label" for="example_url">Example URL Construct</label>
-                <div class="col-md-6">
-                    <input id="example_url" name="example_url" type="text" placeholder="example url construct" class="form-control ">
-
-                </div>
-            </div>
 
 
 
@@ -185,10 +198,10 @@
             </div>
 
 
-            <a id="addParameters" name="add_param" class="btn btn-info">Add More Parameters</a>
+            <a id="addParameters" name="add_param" class="btn btn-primary">Add More Parameters</a>
 
 
-
+<br><br>
 
             <div class="form-group">
                 <legend class="api_title">Exceptions</legend>
@@ -222,10 +235,53 @@
             </div>
 
 
-            <a id="addExceptions" name="add_param" class="btn btn-info">Add More Parameters</a>
+            <a id="addExceptions" name="add_param" class="btn btn-primary">Add More Exceptions</a>
 
 
 
+
+            <br><br>
+
+
+            <div class="form-group">
+                <legend class="api_title">Code Examples</legend>
+
+                <table id="mytableCodeExamples" class="table table-condensed">
+
+                    <tbody class="table-striped">
+
+
+                    <tr>
+
+
+                        <td>
+
+                            <div class="col-md-4">
+                                <select id="output_type" name="code_example_language[]" class="form-control ">
+                                    <option>PHP</option>
+                                    <option>Javascript</option>
+
+                                </select>
+                            </div>
+
+
+
+                        </td>
+
+
+                        <td>
+                          <textarea class="form-control " name="code_example_code[]"> </textarea>
+                        </td>
+
+
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+
+            <a id="addCodeExamples" name="add_param" class="btn btn-primary">Add More Code Examples</a>
 
 
 
@@ -240,9 +296,9 @@
             <!-- Button -->
             <div class="form-group">
                 <label class="col-md-3 control-label" for="submit"></label>
-                <div class="col-lg-6">
+                <div class="col-md-5">
 
-                    <input type="submit" id="submit" name="submit" value="Add New API" class="btn btn-primary">
+                    <input type="submit" id="submit" name="submit" value="Add New API" class="btn btn-success">
 
                 </div>
             </div>

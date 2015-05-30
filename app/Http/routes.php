@@ -29,6 +29,10 @@ Route::get('api/add', 'ApiDocsController@add');
 Route::post('api/insert', 'ApiDocsController@insert');
 
 
-Route::get('api/edit', 'ApiDocsController@update');
+Route::get('api/edit/{id}', 'ApiDocsController@edit')->where('id', '[0-9]+');
+Route::get('api/update', 'ApiDocsController@update');
+
+
+Route::get('api/run/{id}', 'ApiDocsController@run');
 
 
