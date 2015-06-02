@@ -43,8 +43,10 @@
         <fieldset>
 
             <!-- Form Name -->
-            <legend class="api_title">API Details</legend>
-
+<div class="instructions">
+            Please add the details for the API that you have developed. Provide as much details as you can. You can add as many parameters, exceptions/errors and code examples that you wish, by pressing the relevant 'add more' buttons in each sections. It will dynamically augment the form. After filling in the form, press the Green Button at the bottom of the form to Save.
+</div>
+            <h3 class="form_heading">API Details</h3>
             <!-- Select Basic -->
             <div class="form-group">
                 <label class="col-md-3 control-label" for="category">Category</label>
@@ -52,7 +54,7 @@
                     <select id="category" name="category" class="form-control ">
 
                         @foreach ($categories as $category)
-                            <option>{{$category->asset_id}}</option>
+                            <option value="{{$category->asset_id}}">{{$category->asset_id}}</option>
                         @endforeach
 
 
@@ -68,7 +70,7 @@
                 <label class="col-md-3 control-label" for="url_endpoint"><strong>API Endpoint</strong></label>
                 <div class="col-md-8">
                     <input id="url_endpoint" name="url_endpoint" type="text" placeholder="URL Endpoint" class="form-control " required="">
-                    <p class="help-block">e.g /dog/bark</p>
+                    <p class="help-block"><strong>Put URI parameters in curly braces {}</strong> e.g /car/drive/<strong>{</strong>direction<strong>}</strong>/<strong>{</strong>speed<strong>}</strong></p>
                 </div>
             </div>
 
@@ -77,7 +79,7 @@
             <div class="form-group required-control">
                 <label class="col-md-3 control-label" for="url_endpoint">API Alias (e.g Cient SDK)</label>
                 <div class="col-md-8">
-                    <input id="alias" name="alias" type="text" placeholder="API Alias" class="form-control " required="">
+                    <input id="alias" name="alias" type="text" placeholder="API Alias" class="form-control  ">
 
                 </div>
             </div>
@@ -144,8 +146,7 @@
 
 
             <div class="form-group">
-                <legend class="api_title">API Parameters</legend>
-
+                <h3 class="form_heading">API Parameters</h3>
                 <table id="mytable" class="table table-condensed">
 
                     <tbody class="table-striped">
@@ -168,6 +169,18 @@
 
                         <td>
 
+                            <select class="form-control " name="param_location[]" size="3">
+                                <option value="URI" selected>URI</option>
+                                <option value="GET">GET String</option>
+                                <option value="POST">POST Data</option>
+                            </select>
+
+
+                        </td>
+
+
+                        <td>
+
                             <select class="form-control " name="param_required[]" size="2">
                                 <option value="1" selected>Yes</option>
                                 <option value="0">No</option>
@@ -178,8 +191,8 @@
                         <td>
 
                             <select class="form-control " name="param_type[]">
-                                <option>int</option>
                                 <option>string</option>
+                                <option>int</option>
                                 <option>email</option>
                                 <option>date (yyyy-mm-dd)</option>
                             </select>
@@ -204,8 +217,7 @@
 <br><br>
 
             <div class="form-group">
-                <legend class="api_title">Exceptions</legend>
-
+                <h3 class="form_heading">Exceptions</h3>
                 <table id="mytableExceptions" class="table table-condensed">
 
                     <tbody class="table-striped">
@@ -244,7 +256,8 @@
 
 
             <div class="form-group">
-                <legend class="api_title">Code Examples</legend>
+                <h3 class="form_heading">Code Examples</h3>
+                <h4>Do not add the < ?php or the < script> tags as the framework filters them out and does not allow saving </h4>
 
                 <table id="mytableCodeExamples" class="table table-condensed">
 
@@ -284,40 +297,18 @@
             <a id="addCodeExamples" name="add_param" class="btn btn-primary">Add More Code Examples</a>
 
 
-
-
-
-
-
-
-
-
-
             <!-- Button -->
             <div class="form-group">
                 <label class="col-md-3 control-label" for="submit"></label>
                 <div class="col-md-5">
 
-                    <input type="submit" id="submit" name="submit" value="Add New API" class="btn btn-success">
+                    <input type="submit" id="submit" name="submit" value=" >>>>>>>>>>>> ADD NEW API <<<<<<<<<<<<<< " class="btn btn-success">
 
                 </div>
             </div>
 
         </fieldset>
     </form>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

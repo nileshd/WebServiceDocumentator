@@ -49,67 +49,83 @@
 
     @else
 
-    <table class="table">
+        <table class="table">
 
-        @foreach ($parameters as $param)
+            @foreach ($parameters as $param)
 
-<tr>
-    <td class="api_param_name">{{$param['name']}}</td>
-    <td>{{$param['required']}}</td>
-    <td>{{$param['type']}}</td>
-    <td>{{$param['desc']}}</td>
+                <tr>
+                    <td class="api_param_name">{{$param['name']}}</td>
+                    <td>{{$param['location']}}</td>
+                    <td>{{$param['required']}}</td>
+                    <td>{{$param['type']}}</td>
+                    <td>{{$param['desc']}}</td>
 
 
-</tr>
-        @endforeach
+                </tr>
+            @endforeach
 
-    </table>
+        </table>
     @endif
 
 
     @if (count($exceptions) > 0)
-    <h3 class="api_title">Exceptions</h3>
+        <h3 class="api_title">Exceptions</h3>
 
-    <table class="table">
-        @foreach ($exceptions as $exception)
-        <tr>
-            <td>Error Code</td>
-            <td>Description</td>
-        </tr>
-        @endforeach
-    </table>
+        <table class="table">
+            @foreach ($exceptions as $exception)
+                <tr>
+                    <td>{{$exception['code']}}</td>
+                    <td>{{$exception['name']}}</td>
+                    <td>{{$exception['desc']}}</td>
+                </tr>
+            @endforeach
+        </table>
     @endif
 
     <h3 class="api_title">URL Construct</h3>
     {{$api['example_call_construct']}}
-<br>
+    <br>
     @foreach ($servers as $server)
-       <strong>{{$server->asset_label}}</strong>  {{$server->asset_id}}{{$api['api_endpoint']}}?token=iamsparefoot&pretty=1  <br>
+        <strong>{{$server->asset_label}}</strong>  {{$server->asset_id}}{{$api['api_endpoint']}}?token=iamsparefoot&pretty=1  <br>
     @endforeach
 
     <h3 class="api_title">Example Success</h3>
 
-<pre class=" prettyprint">
+    <pre class=" prettyprint">
 {{$api['json_example_success']}}
 </pre>
 
 
 
     @if ($api['json_example_failure'] != "" )
-    <h3 class="api_title">Example Failure</h3>
-    <div class="well">
-        {{$api['json_example_failure']}}
-    </div>
+        <h3 class="api_title">Example Failure</h3>
+        <div class="well">
+            {{$api['json_example_failure']}}
+        </div>
 
     @endif
 
 
 
-    @if ($api['json_example_code'] != "" )
+    @if (!rtrim(ltrim($api['json_example_code'])) )
         <h3 class="api_title">Example Client Code</h3>
-<pre class=" prettyprint">
-{{$api['json_example_code']}}
+
+
+
+        @foreach ($code_examples as $example)
+
+
+            <h4>{{$example['language']}}</h4>
+            <pre class=" prettyprint">
+<?php echo stripslashes($example['code']); ?>
 </pre>
+
+
+
+        @endforeach
+
+
+
 
     @endif
 

@@ -9,6 +9,15 @@
 @section('content')
     <h3>List All Apis</h3>
 
+
+
+    @if (count($apis) === 0)
+
+        No APIs have been added yet.
+
+    @else
+
+
     <table class="table">
 
 
@@ -57,7 +66,8 @@
                     <?php echo $api->api_endpoint; ?>
                 </a>
 
-                <a href="/api/edit/{{$api->id}}">(E)</a>
+                <a href="/api/edit/{{$api->id}}">(Edit)</a>
+                <a href="/api/run/{{$api->id}}">(Run)</a>
             </td>
 
             <td>
@@ -71,6 +81,6 @@
         @endforeach
 
     </table>
-
+    @endif
 @endsection
 

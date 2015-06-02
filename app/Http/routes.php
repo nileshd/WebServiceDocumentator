@@ -11,9 +11,8 @@
 |
 */
 
-Route::get('/', 'WelcomeController@index');
+Route::get('/', 'ApiDocsController@dashboard');
 
-Route::get('home', 'HomeController@index');
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',
@@ -30,9 +29,16 @@ Route::post('api/insert', 'ApiDocsController@insert');
 
 
 Route::get('api/edit/{id}', 'ApiDocsController@edit')->where('id', '[0-9]+');
-Route::get('api/update', 'ApiDocsController@update');
+Route::post('api/update', 'ApiDocsController@update');
 
 
 Route::get('api/run/{id}', 'ApiDocsController@run');
+Route::get('api/dashboard', 'ApiDocsController@dashboard');
+
+
+
+Route::get('lookups/list', 'LookupsController@getAll');
+Route::get('lookups/add/{asset_type}', 'LookupsController@add');
+Route::post('lookups/insert', 'LookupsController@insert');
 
 

@@ -3,13 +3,61 @@
 use App\apidoc;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use App\lookup;
+
 use Illuminate\Http\Request;
 
 class ApiDocsController extends Controller {
 
+
+
+public function dashboard()
+{
+    $num_apis_for_categories = DB::select('select distinct category,count(api_endpoint) as num_endpoints,max(updated_at) as last_date from apidocs GROUP by category order by num_endpoints desc');
+
+    for ($a=0;$a<count($num_apis_for_categories); $a++)
+    {
+        $api = $num_apis_for_categories[$a];
+        $days_ago =  Carbon::createFromTimestamp(strtotime($api->last_date))->diffInDays();
+        $api->days_ago = $days_ago;
+        $num_apis_for_categories[$a] = $api;
+    }
+
+
+
+    $data = array();
+    $data['num_apis_for_categories'] = $num_apis_for_categories;
+
+    return view("apidoc.dashboard", $data);
+}
+
+
     public function getAll()
+    {
+
+
+        $apiList =   DB::table('apidocs')->where('flag_on', '=', 1)->get();
+        $apiList = $this->processAPIList($apiList);
+        $data = array();
+        $data['apis'] = $apiList;
+        return view("apidoc.list", $data);
+    }
+
+
+    public function getByCategory($category)
+    {
+        $apiList =   DB::table('apidocs')->where('category', '=', $category)->where('flag_on', '=', 1)->get();
+        $apiList = $this->processAPIList($apiList);
+
+        $data = array();
+        $data['apis'] = $apiList;
+        return view("apidoc.list", $data);
+    }
+
+
+
+    public function getApis($category=null)
     {
         $apiList =   DB::table('apidocs')->where('flag_on', '=', 1)->get();
         $apiList = $this->processAPIList($apiList);
@@ -20,9 +68,30 @@ class ApiDocsController extends Controller {
     }
 
 
+    private function processAPIList($apiList)
+    {
+        for ($a=0;$a<count($apiList);$a++)
+        {
+            $api = $apiList[$a];
+            $api_endpoint = $api->api_endpoint;
+            // Adding colorized labels to URL endpoints
+            preg_match_all('/{(.*?)}/', $api_endpoint, $matches);
+            foreach($matches[1] as $match)
+            {
+                $search = "{".$match."}";
+                $to_replace = "<span class=\"api_endpoint_parts\">$search</span>";
+                $api_endpoint = str_replace($search,$to_replace,$api_endpoint);
+            }
+            $api->api_endpoint = $api_endpoint;
+            $apiList[$a] = $api;
+        }
+        return $apiList;
+    }
+
+
+
     public function run($id)
     {
-
 
         $apidoc = new apidoc();
         $api_details = $apidoc->find($id)->toArray();
@@ -32,8 +101,8 @@ class ApiDocsController extends Controller {
 
 
         $category = $api_details['category'];
-        $servers =   DB::table('lookups')->where('asset_type', '=', "base_server_url")->where('secondary_filter', '=', $category)->get();
 
+        $servers = $this->lookupManager->getBaseServerUrlsByCategory($category);
 
         $api_endpoint = $api_details['api_endpoint'];
         // Adding colorized labels to URL endpoints
@@ -69,21 +138,31 @@ class ApiDocsController extends Controller {
     }
 
 
+
+
+
     public function getById($id)
     {
 
-        $servers =   DB::table('lookups')->where('asset_type', '=', "category")->get();
 
         $apidoc = new apidoc();
         $api_details = $apidoc->find($id)->toArray();
+
+        if (!$api_details)
+        {
+            exit("NIL");
+        }
+
+
         $parameters = ($api_details['json_parameters_needed']!="") ? json_decode($api_details['json_parameters_needed'],true) : array();
         $exceptions = ($api_details['json_exceptions']!="") ? json_decode($api_details['json_exceptions'],true) : array();
-
+        $code_examples = ($api_details['json_example_code']!="") ? json_decode($api_details['json_example_code'],true) : array();
 
 
         $category = $api_details['category'];
-        $servers =   DB::table('lookups')->where('asset_type', '=', "base_server_url")->where('secondary_filter', '=', $category)->get();
 
+
+        $servers =  $this->lookupManager->getBaseServerUrlsByCategory($category);
 
         // Adding colorized labels to URL endpoints
         $api_end_point = $api_details['api_endpoint'];
@@ -99,6 +178,7 @@ class ApiDocsController extends Controller {
         $data['api'] = $api_details;
         $data['parameters'] = $parameters;
         $data['exceptions'] = $exceptions;
+        $data['code_examples'] = $code_examples;
         $data['endpoint'] = $api_end_point;
         $data['servers'] = $servers;
 
@@ -106,41 +186,16 @@ class ApiDocsController extends Controller {
 
     }
 
-    private function processAPIList($apiList)
-    {
-        for ($a=0;$a<count($apiList);$a++)
-        {
-            $api = $apiList[$a];
-            $api_endpoint = $api->api_endpoint;
-            // Adding colorized labels to URL endpoints
-            preg_match_all('/{(.*?)}/', $api_endpoint, $matches);
-            foreach($matches[1] as $match)
-            {
-                $search = "{".$match."}";
-                $to_replace = "<span class=\"api_endpoint_parts\">$search</span>";
-                $api_endpoint = str_replace($search,$to_replace,$api_endpoint);
-            }
-            $api->api_endpoint = $api_endpoint;
-            $apiList[$a] = $api;
-        }
-        return $apiList;
-    }
 
 
-    public function getByCategory($category)
-    {
-        $apiList =   DB::table('apidocs')->where('category', '=', $category)->get();
-        $apiList = $this->processAPIList($apiList);
 
-        $data = array();
-        $data['apis'] = $apiList;
-        return view("apidoc.list", $data);
-    }
 
     public function add()
     {
 
-        $categories =   DB::table('lookups')->where('asset_type', '=', "category")->get();
+
+        $categories = $this->lookupManager->getCategories();
+
         $data = array();
         $data['categories'] = $categories;
         return view("apidoc.add", $data);
@@ -152,18 +207,23 @@ class ApiDocsController extends Controller {
 
         $apidoc = new apidoc();
         $api_details = $apidoc->find($id)->toArray();
-        $categories =   DB::table('lookups')->where('asset_type', '=', "category")->get();
 
+
+        $categories = $this->lookupManager->getCategories();
 
         $parameters = ($api_details['json_parameters_needed']!="") ? json_decode($api_details['json_parameters_needed'],true) : array();
         $exceptions = ($api_details['json_exceptions']!="") ? json_decode($api_details['json_exceptions'],true) : array();
+        $code_examples = ($api_details['json_example_code']!="") ? json_decode($api_details['json_example_code'],true) : array();
+
 
 
 
         $data = array();
         $data['api'] = $api_details;
+        $data['api_id'] = $id;
         $data['parameters'] = $parameters;
         $data['exceptions'] = $exceptions;
+        $data['code_examples'] = $code_examples;
         $data['categories'] = $categories;
 
         return view("apidoc.edit", $data);
@@ -184,6 +244,9 @@ class ApiDocsController extends Controller {
             $item_array['type'] = $_POST['param_type'][$a];
             $item_array['required'] = $_POST['param_required'][$a];
             $item_array['desc'] = $_POST['param_description'][$a];
+            $item_array['location'] = $_POST['param_location'][$a];
+            $item_array['length'] = "";
+
 
             if ($item_array['name']!="") {
                 $return_array[] = $item_array;
@@ -273,6 +336,8 @@ class ApiDocsController extends Controller {
             $data = array();
             $data['category'] = $_POST['category'];
             $data['url_endpoint'] = $_POST['url_endpoint'];
+            $data['api_id'] = $apidoc->id;
+            $data['action_verb'] = "inserted";
 
             return view("apidoc.add_successful", $data);
         }
@@ -285,10 +350,60 @@ class ApiDocsController extends Controller {
     }
 
 
-    public function update()
+    public function update(Request $request)
     {
-        $data = array();
-        return view("apidoc.edit", $data);
+
+        $api_id = $_POST['api_id'];
+        $apidoc = new apidoc();
+        //$apidoc = new apidoc();
+        $apidoc = $apidoc->find($api_id);
+
+
+
+
+
+        $apidoc->name = $_POST['name'];
+        $apidoc->description = $_POST['description'];
+        $apidoc->category = $_POST['category'];
+
+        $apidoc->api_endpoint = $_POST['url_endpoint'];
+        $apidoc->alias = $_POST['alias'];
+
+        $apidoc->method = $_POST['http_method'];
+        $apidoc->output_format = $_POST['output_type'];
+        $apidoc->json_example_success = $_POST['json_success'];
+
+
+        $json_api_params = $this->processApiParamsFromForm($_POST['param_name']);
+        $apidoc->json_parameters_needed = $json_api_params;
+
+        $json_exceptions = $this->processApiExceptionsFromForm($_POST['exception_name']);
+        $apidoc->json_exceptions = $json_exceptions;
+
+        $json_codeexamples = $this->processApiCodeExamplesFromForm($request->input('code_example_code'));
+        $apidoc->json_example_code = $json_codeexamples;
+
+
+
+        try {
+            $apidoc->save();
+
+            $data = array();
+            $data['category'] = $_POST['category'];
+            $data['url_endpoint'] = $_POST['url_endpoint'];
+            $data['api_id'] = $api_id;
+            $data['action_verb'] = "updated";
+
+            return view("apidoc.add_successful", $data);
+        }
+        catch (\Exception $e)
+        {
+            $data = array();
+            $data['error_message'] = $e->getMessage();
+            return view("apidoc.add_failed", $data);
+        }
+
+
 
     }
 
