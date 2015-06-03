@@ -23,18 +23,26 @@
 
         $( "#run_api" ).click(function() {
 
+
             var f_api_base_url = $('#form_api_base_url').val();
             var f_api_end_point = $('#form_api_end_point').html();
+
+            if (f_api_base_url == "") {
+                alert("Please pick a server before proceeding");
+            }
+            else {
+
+
 
             // Removing HTML
             f_api_base_url = f_api_base_url.replace(/<\/?[^>]+(>|$)/g, "");
             f_api_end_point = f_api_end_point.replace(/<\/?[^>]+(>|$)/g, "");
 
 
-           // alert(f_api_end_point);
+            // alert(f_api_end_point);
 
-            $('#run_output').html(f_api_base_url+f_api_end_point);
-
+            $('#run_output').html(f_api_base_url + f_api_end_point);
+        }
         });
 
 
@@ -107,6 +115,8 @@
                         <tr>
                             <td class="col-md-4"><strong>{ { {{$param}} } }</strong></td>
                             <td><input id="param_field" type="text" name="{{$param}}" value="" class="param_input"></td>
+
+
                         </tr>
 
                     @endforeach

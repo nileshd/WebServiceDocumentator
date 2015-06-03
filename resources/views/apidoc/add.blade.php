@@ -125,10 +125,10 @@
                 <label class="col-md-3 control-label" for="http_method">API Output Type</label>
                 <div class="col-md-2">
                     <select id="output_type" name="output_type" class="form-control ">
-                        <option>JSON</option>
-                        <option>XML</option>
-                        <option>CSV</option>
-                        <option>TXT</option>
+                        @foreach ($outputTypes as $outputType)
+                            <option value="{{$outputType->asset_id}}">{{$outputType->asset_id}}</option>
+                        @endforeach
+
                     </select>
                 </div>
             </div>
@@ -144,6 +144,15 @@
             </div>
 
 
+            <!-- Text input-->
+            <div class="form-group">
+                <label class="col-md-3 control-label" for="name">Example URL Construct</label>
+                <div class="col-md-5">
+                    <input id="example_call_construct" name="example_call_construct" type="text" placeholder="a real example with example parameters e.g /car/increase_speed/5" class="form-control ">
+
+                </div>
+            </div>
+
 
             <div class="form-group">
                 <h3 class="form_heading">API Parameters</h3>
@@ -153,6 +162,7 @@
 
 
                     <tr>
+                        <td>&nbsp;</td>
                         <td>&nbsp;</td>
                         <td>Required</td>
                         <td>Type</td>
@@ -169,10 +179,11 @@
 
                         <td>
 
-                            <select class="form-control " name="param_location[]" size="3">
-                                <option value="URI" selected>URI</option>
-                                <option value="GET">GET String</option>
-                                <option value="POST">POST Data</option>
+                            <select class="form-control " name="param_location[]">
+                                @foreach ($paramCategories as $paramCategory)
+                                    <option value="{{$paramCategory->asset_id}}">{{$paramCategory->asset_id}}</option>
+                                @endforeach
+
                             </select>
 
 
@@ -191,10 +202,9 @@
                         <td>
 
                             <select class="form-control " name="param_type[]">
-                                <option>string</option>
-                                <option>int</option>
-                                <option>email</option>
-                                <option>date (yyyy-mm-dd)</option>
+                                @foreach ($paramTypes as $paramType)
+                                    <option value="{{$paramType->asset_id}}">{{$paramType->asset_id}}</option>
+                                @endforeach
                             </select>
 
                         </td>
@@ -271,8 +281,10 @@
 
                             <div class="col-md-4">
                                 <select id="output_type" name="code_example_language[]" class="form-control ">
-                                    <option>PHP</option>
-                                    <option>Javascript</option>
+
+                                    @foreach ($languages as $language)
+                                        <option value="{{$language->asset_id}}">{{$language->asset_id}}</option>
+                                    @endforeach
 
                                 </select>
                             </div>

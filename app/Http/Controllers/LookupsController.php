@@ -56,7 +56,7 @@ class LookupsController extends Controller {
         $lookup->asset_id = $_POST['asset_id'];
         $lookup->secondary_filter = $_POST['secondary_filter'];
         $lookup->asset_label = $_POST['asset_label'];
-
+        $lookup->weight = $_POST['weight'];
         try {
             $lookup->save();
 

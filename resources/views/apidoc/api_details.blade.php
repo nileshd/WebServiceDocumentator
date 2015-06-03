@@ -89,25 +89,7 @@
         <strong>{{$server->asset_label}}</strong>  {{$server->asset_id}}{{$api['api_endpoint']}}?token=iamsparefoot&pretty=1  <br>
     @endforeach
 
-    <h3 class="api_title">Example Success</h3>
-
-    <pre class=" prettyprint">
-{{$api['json_example_success']}}
-</pre>
-
-
-
-    @if ($api['json_example_failure'] != "" )
-        <h3 class="api_title">Example Failure</h3>
-        <div class="well">
-            {{$api['json_example_failure']}}
-        </div>
-
-    @endif
-
-
-
-    @if (!rtrim(ltrim($api['json_example_code'])) )
+    @if (rtrim(ltrim($api['json_example_code'])) != "" )
         <h3 class="api_title">Example Client Code</h3>
 
 
@@ -128,6 +110,26 @@
 
 
     @endif
+
+
+    <h3 class="api_title">Example Success</h3>
+
+    <pre class=" prettyprint">
+{{$api['json_example_success']}}
+</pre>
+
+
+
+    @if ($api['json_example_failure'] != "" )
+        <h3 class="api_title">Example Failure</h3>
+        <div class="well">
+            {{$api['json_example_failure']}}
+        </div>
+
+    @endif
+
+
+
 
 
 @endsection

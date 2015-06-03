@@ -128,10 +128,9 @@
                 <div class="col-md-2">
                     <select id="output_type" name="output_type" class="form-control ">
                         <option value="{{$api['output_format']}}" selected>{{$api['output_format']}}</option>
-                        <option>JSON</option>
-                        <option>XML</option>
-                        <option>CSV</option>
-                        <option>TXT</option>
+                        @foreach ($outputTypes as $outputType)
+                            <option value="{{$outputType->asset_id}}">{{$outputType->asset_id}}</option>
+                        @endforeach
                     </select>
                 </div>
             </div>
@@ -146,6 +145,14 @@
                 </div>
             </div>
 
+
+            <div class="form-group">
+                <label class="col-md-3 control-label" for="name">Example URL Construct</label>
+                <div class="col-md-5">
+                    <input id="example_call_construct" name="example_call_construct" type="text" placeholder="a real example with example parameters e.g /car/increase_speed/5" class="form-control " value="{{$api['example_call_construct']}}">
+
+                </div>
+            </div>
 
 
             <div class="form-group">
@@ -177,9 +184,9 @@
                             <td>
 
                                 <select class="form-control " name="param_location[]" size="3">
-                                    <option value="URI" selected>URI</option>
-                                    <option value="GET">GET String</option>
-                                    <option value="POST">POST Data</option>
+                                    @foreach ($paramCategories as $paramCategory)
+                                        <option value="{{$paramCategory->asset_id}}">{{$paramCategory->asset_id}}</option>
+                                    @endforeach
                                 </select>
 
 
@@ -199,10 +206,9 @@
                             <td>
 
                                 <select class="form-control " name="param_type[]">
-                                    <option>string</option>
-                                    <option>int</option>
-                                    <option>email</option>
-                                    <option>date (yyyy-mm-dd)</option>
+                                    @foreach ($paramTypes as $paramType)
+                                        <option value="{{$paramType->asset_id}}">{{$paramType->asset_id}}</option>
+                                    @endforeach
                                 </select>
 
                             </td>
@@ -231,9 +237,9 @@
 
                                     <select class="form-control " name="param_location[]" size="2">
                                         <option value="{{$parameter['location']}}" selected>{{$parameter['location']}}</option>
-                                        <option value="URI" selected>URI</option>
-                                        <option value="GET">GET String</option>
-                                        <option value="POST">POST Data</option>
+                                        @foreach ($paramCategories as $paramCategory)
+                                            <option value="{{$paramCategory->asset_id}}">{{$paramCategory->asset_id}}</option>
+                                        @endforeach
                                     </select>
 
 
@@ -255,10 +261,9 @@
                                     <select class="form-control " name="param_type[]">
 
                                         <option value="{{$parameter['type']}}" selected>{{$parameter['type']}}</option>
-                                        <option>string</option>
-                                        <option>int</option>
-                                        <option>email</option>
-                                        <option>date (yyyy-mm-dd)</option>
+                                        @foreach ($paramTypes as $paramType)
+                                            <option value="{{$paramType->asset_id}}">{{$paramType->asset_id}}</option>
+                                        @endforeach
                                     </select>
 
                                 </td>
@@ -328,8 +333,9 @@
                             <td>
                                 <div class="col-md-4">
                                     <select id="output_type" name="code_example_language[]" class="form-control ">
-                                        <option>PHP</option>
-                                        <option>Javascript</option>
+                                        @foreach ($languages as $language)
+                                            <option value="{{$language->asset_id}}">{{$language->asset_id}}</option>
+                                        @endforeach
 
                                     </select>
                                 </div>
@@ -346,8 +352,9 @@
                                     <div class="col-md-4">
                                         <select id="output_type" name="code_example_language[]" class="form-control ">
                                             <option value="{{$example['language']}}">{{$example['language']}}</option>
-                                            <option>PHP</option>
-                                            <option>Javascript</option>
+                                            @foreach ($languages as $language)
+                                                <option value="{{$language->asset_id}}">{{$language->asset_id}}</option>
+                                            @endforeach
 
                                         </select>
                                     </div>

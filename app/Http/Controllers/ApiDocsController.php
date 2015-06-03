@@ -12,46 +12,56 @@ class ApiDocsController extends Controller {
 
 
 
-public function dashboard()
-{
-    $num_apis_for_categories = DB::select('select distinct category,count(api_endpoint) as num_endpoints,max(updated_at) as last_date from apidocs GROUP by category order by num_endpoints desc');
-
-    for ($a=0;$a<count($num_apis_for_categories); $a++)
+    public function dashboard()
     {
-        $api = $num_apis_for_categories[$a];
-        $days_ago =  Carbon::createFromTimestamp(strtotime($api->last_date))->diffInDays();
-        $api->days_ago = $days_ago;
-        $num_apis_for_categories[$a] = $api;
+        $num_apis_for_categories = DB::select('select distinct category,count(api_endpoint) as num_endpoints,max(updated_at) as last_date from apidocs GROUP by category order by num_endpoints desc');
+
+        for ($a=0;$a<count($num_apis_for_categories); $a++)
+        {
+            $api = $num_apis_for_categories[$a];
+            $days_ago =  Carbon::createFromTimestamp(strtotime($api->last_date))->diffInDays();
+            $api->days_ago = $days_ago;
+            $num_apis_for_categories[$a] = $api;
+        }
+
+
+
+        $data = array();
+        $data['num_apis_for_categories'] = $num_apis_for_categories;
+
+        return view("apidoc.dashboard", $data);
     }
 
+    public function about()
+    {
 
+        $data = array();
+        return view("about", $data);
+    }
 
-    $data = array();
-    $data['num_apis_for_categories'] = $num_apis_for_categories;
-
-    return view("apidoc.dashboard", $data);
-}
 
 
     public function getAll()
     {
 
 
-        $apiList =   DB::table('apidocs')->where('flag_on', '=', 1)->get();
+        $apiList =   DB::table('apidocs')->where('flag_on', '=', 1)->orderBy('api_endpoint', 'asc')->get();
         $apiList = $this->processAPIList($apiList);
         $data = array();
         $data['apis'] = $apiList;
+        $data['api_type'] = " All ";
         return view("apidoc.list", $data);
     }
 
 
     public function getByCategory($category)
     {
-        $apiList =   DB::table('apidocs')->where('category', '=', $category)->where('flag_on', '=', 1)->get();
+        $apiList =   DB::table('apidocs')->where('category', '=', $category)->where('flag_on', '=', 1)->orderBy('api_endpoint', 'asc')->get();
         $apiList = $this->processAPIList($apiList);
 
         $data = array();
         $data['apis'] = $apiList;
+        $data['api_type'] = $category;
         return view("apidoc.list", $data);
     }
 
@@ -194,10 +204,19 @@ public function dashboard()
     {
 
 
-        $categories = $this->lookupManager->getCategories();
+        $languages = $this->lookupManager->getLanguages();
+        $outputTypes = $this->lookupManager->getOutputTypes();
+        $paramTypes = $this->lookupManager->getParamTypes();
+        $paramCategories = $this->lookupManager->getParamCategories();
 
         $data = array();
-        $data['categories'] = $categories;
+        $data['categories'] = $this->categories;
+        $data['languages'] = $languages;
+        $data['outputTypes'] = $outputTypes;
+
+        $data['paramTypes'] = $paramTypes;
+        $data['paramCategories'] = $paramCategories;
+
         return view("apidoc.add", $data);
 
     }
@@ -208,14 +227,16 @@ public function dashboard()
         $apidoc = new apidoc();
         $api_details = $apidoc->find($id)->toArray();
 
-
-        $categories = $this->lookupManager->getCategories();
-
         $parameters = ($api_details['json_parameters_needed']!="") ? json_decode($api_details['json_parameters_needed'],true) : array();
         $exceptions = ($api_details['json_exceptions']!="") ? json_decode($api_details['json_exceptions'],true) : array();
         $code_examples = ($api_details['json_example_code']!="") ? json_decode($api_details['json_example_code'],true) : array();
 
 
+
+        $languages = $this->lookupManager->getLanguages();
+        $outputTypes = $this->lookupManager->getOutputTypes();
+        $paramTypes = $this->lookupManager->getParamTypes();
+        $paramCategories = $this->lookupManager->getParamCategories();
 
 
         $data = array();
@@ -224,7 +245,13 @@ public function dashboard()
         $data['parameters'] = $parameters;
         $data['exceptions'] = $exceptions;
         $data['code_examples'] = $code_examples;
-        $data['categories'] = $categories;
+        $data['categories'] = $this->categories;
+
+        $data['languages'] = $languages;
+        $data['outputTypes'] = $outputTypes;
+
+        $data['paramTypes'] = $paramTypes;
+        $data['paramCategories'] = $paramCategories;
 
         return view("apidoc.edit", $data);
 
@@ -295,7 +322,7 @@ public function dashboard()
             $item_array['code'] = addslashes($_POST['code_example_code'][$a]);
 
 
-            if ($item_array['code']!="") {
+            if (rtrim(ltrim($item_array['code']))!="") {
                 $return_array[] = $item_array;
             }
         }
@@ -317,7 +344,7 @@ public function dashboard()
         $apidoc->method = $_POST['http_method'];
         $apidoc->output_format = $_POST['output_type'];
         $apidoc->json_example_success = $_POST['json_success'];
-
+        $apidoc->example_call_construct = $_POST['example_call_construct'];
 
         $json_api_params = $this->processApiParamsFromForm($_POST['param_name']);
         $apidoc->json_parameters_needed = $json_api_params;
@@ -337,6 +364,7 @@ public function dashboard()
             $data['category'] = $_POST['category'];
             $data['url_endpoint'] = $_POST['url_endpoint'];
             $data['api_id'] = $apidoc->id;
+            $data['api_method'] = $_POST['http_method'];
             $data['action_verb'] = "inserted";
 
             return view("apidoc.add_successful", $data);
@@ -372,7 +400,7 @@ public function dashboard()
         $apidoc->method = $_POST['http_method'];
         $apidoc->output_format = $_POST['output_type'];
         $apidoc->json_example_success = $_POST['json_success'];
-
+        $apidoc->example_call_construct = $_POST['example_call_construct'];
 
         $json_api_params = $this->processApiParamsFromForm($_POST['param_name']);
         $apidoc->json_parameters_needed = $json_api_params;
@@ -392,6 +420,7 @@ public function dashboard()
             $data['category'] = $_POST['category'];
             $data['url_endpoint'] = $_POST['url_endpoint'];
             $data['api_id'] = $api_id;
+            $data['api_method'] = $_POST['http_method'];
             $data['action_verb'] = "updated";
 
             return view("apidoc.add_successful", $data);

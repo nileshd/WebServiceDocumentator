@@ -59,6 +59,14 @@ The Lookups table is a very generic key value table that stores all lookup infor
                 </div>
             </div>
 
+            <!-- Text input-->
+            <div class="form-group required-control">
+                <label class="col-md-3 control-label" for=""><strong>Sort Weight </strong></label>
+                <div class="col-md-8">
+                    <input id="weight" name="weight" type="text" placeholder="" class="form-control ">
+
+                </div>
+            </div>
 
             <!-- Button -->
             <div class="form-group">

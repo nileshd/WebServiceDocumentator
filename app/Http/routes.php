@@ -20,6 +20,9 @@ Route::controllers([
 ]);
 
 
+Route::get('about', 'ApiDocsController@about');
+
+
 Route::get('api/list', 'ApiDocsController@getAll');
 Route::get('api/category/{id}', 'ApiDocsController@getByCategory');
 Route::get('api/{id}', 'ApiDocsController@getById')->where('id', '[0-9]+');
@@ -41,4 +44,14 @@ Route::get('lookups/list', 'LookupsController@getAll');
 Route::get('lookups/add/{asset_type}', 'LookupsController@add');
 Route::post('lookups/insert', 'LookupsController@insert');
 
+
+Route::get('pages/add', 'PagesController@add');
+Route::post('pages/insert', 'PagesController@insert');
+
+
+Route::get('pages/list', 'PagesController@getAll');
+Route::get('pages/category/{id}', 'PagesController@getByCategory');
+Route::get('pages/{id}', 'PagesController@getById')->where('id', '[0-9]+');
+Route::get('pages/edit/{id}', 'PagesController@edit')->where('id', '[0-9]+');
+Route::post('pages/update', 'PagesController@update');
 

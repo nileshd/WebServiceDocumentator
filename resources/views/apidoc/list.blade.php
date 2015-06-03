@@ -1,13 +1,15 @@
 @extends('app')
 
 @section('javascript')
+    <script src="/js/bootstrap-table/bootstrap-table.js"></script>
 @endsection
 
 @section('css')
+    <link rel="stylesheet" href="/css/bootstrap-table.css">
 @endsection
 
 @section('content')
-    <h3>List All Apis</h3>
+    <h3>List {{$api_type}} Apis</h3>
 
 
 
@@ -18,9 +20,21 @@
     @else
 
 
-    <table class="table">
+    <table class="table" data-toggle="table" data-show-columns="true" data-search="true" >
+
+<thead>
+<tr>
+    <th data-field="category" data-sortable="true">Category</th>
+    <th data-field="method" data-sortable="true">Method</th>
+    <th data-field="name" data-sortable="true">URL End Point</th>
+    <th data-field="desc" data-sortable="true">Description</th>
 
 
+
+</tr>
+
+
+</thead>
 
 
         @foreach ($apis as $api)
