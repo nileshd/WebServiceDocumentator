@@ -28,6 +28,18 @@
         });
 
 
+        $("#addLinks, .check ").click(function() {
+            $('#mytableLinks tbody>tr:last')
+                    .clone(true)
+                    .insertAfter('#mytableLinks tbody>tr:last').find('input').each(function(){
+                        $(this).val('');
+                    });
+        });
+
+
+
+
+
     </script>
 @endsection
 @section('css')
@@ -360,7 +372,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <textarea class="form-control " name="code_example_code[]"> <?php echo $example['code']; ?></textarea>
+                                    <textarea class="form-control " name="code_example_code[]"> <?php echo stripslashes($example['code']); ?></textarea>
                                 </td>
                             </tr>
                         @endforeach
@@ -370,6 +382,65 @@
             </div>
 
             <a id="addCodeExamples" name="add_param" class="btn btn-primary">Add More Code Examples</a>
+
+
+
+
+<br><br>
+
+
+
+            <div class="form-group">
+                <h3 class="form_heading">Related Links</h3>
+                <h4>Add related links to this API </h4>
+
+                <table id="mytableLinks" class="table table-condensed">
+
+                    <tbody class="table-striped">
+
+                    @if (count($related_links) === 0)
+                    <tr>
+                        <td>
+
+                            <input type="text"  placeholder="URL to link" name="related_link[]" class="form-control ">
+
+
+                        </td>
+
+
+                    </tr>
+                    @else
+                        @foreach ($related_links as $link)
+
+                            <tr>
+                                <td>
+
+                                    <input type="text"  placeholder="URL to link" name="related_link[]" class="form-control " value="{{$link['url']}}">
+
+
+                                </td>
+
+
+                            </tr>
+
+                        @endforeach
+                    @endif
+
+                    </tbody>
+                </table>
+
+            </div>
+
+
+            <a id="addLinks" name="add_param" class="btn btn-primary">Add More Links</a>
+
+
+
+
+
+
+
+
 
             <!-- Button -->
             <div class="form-group">

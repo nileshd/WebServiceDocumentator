@@ -37,6 +37,8 @@ Route::post('api/update', 'ApiDocsController@update');
 
 Route::get('api/run/{id}', 'ApiDocsController@run');
 Route::get('api/dashboard', 'ApiDocsController@dashboard');
+Route::get('api/output', 'ApiDocsController@run_ws');
+
 
 
 
@@ -55,3 +57,7 @@ Route::get('pages/{id}', 'PagesController@getById')->where('id', '[0-9]+');
 Route::get('pages/edit/{id}', 'PagesController@edit')->where('id', '[0-9]+');
 Route::post('pages/update', 'PagesController@update');
 
+
+
+
+Route::get('testauth', 'WelcomeController@loginWithGoogle');

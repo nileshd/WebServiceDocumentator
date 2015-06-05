@@ -17,13 +17,23 @@
             <tr>
                 <td>
 
-                    <a href="/api/category/{{$api_category->category}}">
+
                         <h3> {{$api_category->category}}</h3>
-                    </a>
+
                 </td>
 
                 <td>
-                  <h3>  {{$api_category->num_endpoints}} API endpoints </h3>
+                    <a href="/api/category/{{$api_category->category}}">
+                  <h3>  {{$api_category->num_endpoints}} API endpoints </h3></a>
+                </td>
+
+                <td>
+                    <a href="/pages/category/{{$api_category->category}}">
+                    <h3>
+                    <?php if (array_key_exists($api_category->category,$num_pages_for_categories)) { ?>
+                    {{$num_pages_for_categories[$api_category->category]}}
+<? } else { ?> 0 <?php } ?>
+                        Pages</h3></a>
                 </td>
 
                 <td>

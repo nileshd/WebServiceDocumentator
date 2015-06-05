@@ -5,8 +5,10 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-
+use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
+
 
 class ApiDocsController extends Controller {
 
@@ -16,6 +18,8 @@ class ApiDocsController extends Controller {
     {
         $num_apis_for_categories = DB::select('select distinct category,count(api_endpoint) as num_endpoints,max(updated_at) as last_date from apidocs GROUP by category order by num_endpoints desc');
 
+        $num_pages_for_categories = DB::select('select distinct category,count(title) as num_pages,max(updated_at) as last_date from pages GROUP by category order by num_pages desc');
+
         for ($a=0;$a<count($num_apis_for_categories); $a++)
         {
             $api = $num_apis_for_categories[$a];
@@ -24,10 +28,22 @@ class ApiDocsController extends Controller {
             $num_apis_for_categories[$a] = $api;
         }
 
+        $categories = array();
+
+        for ($a=0;$a<count($num_pages_for_categories); $a++)
+        {
+            $page = $num_pages_for_categories[$a];
+
+            $categories[$page->category] = $page->num_pages;
+        }
+
+
 
 
         $data = array();
         $data['num_apis_for_categories'] = $num_apis_for_categories;
+        $data['num_pages_for_categories'] = $categories;
+
 
         return view("apidoc.dashboard", $data);
     }
@@ -153,20 +169,22 @@ class ApiDocsController extends Controller {
 
     public function getById($id)
     {
-
-
         $apidoc = new apidoc();
         $api_details = $apidoc->find($id)->toArray();
 
         if (!$api_details)
         {
-            exit("NIL");
+            exit("Sorry API does not exist");
         }
 
 
         $parameters = ($api_details['json_parameters_needed']!="") ? json_decode($api_details['json_parameters_needed'],true) : array();
         $exceptions = ($api_details['json_exceptions']!="") ? json_decode($api_details['json_exceptions'],true) : array();
         $code_examples = ($api_details['json_example_code']!="") ? json_decode($api_details['json_example_code'],true) : array();
+
+        $related_links = ($api_details['json_links']!="") ? json_decode($api_details['json_links'],true) : array();
+
+
 
 
         $category = $api_details['category'];
@@ -184,6 +202,8 @@ class ApiDocsController extends Controller {
             $api_end_point = str_replace($search,$to_replace,$api_end_point);
         }
 
+
+
         $data = array();
         $data['api'] = $api_details;
         $data['parameters'] = $parameters;
@@ -191,6 +211,7 @@ class ApiDocsController extends Controller {
         $data['code_examples'] = $code_examples;
         $data['endpoint'] = $api_end_point;
         $data['servers'] = $servers;
+        $data['related_links'] = $related_links;
 
         return view("apidoc.api_details", $data);
 
@@ -230,6 +251,9 @@ class ApiDocsController extends Controller {
         $parameters = ($api_details['json_parameters_needed']!="") ? json_decode($api_details['json_parameters_needed'],true) : array();
         $exceptions = ($api_details['json_exceptions']!="") ? json_decode($api_details['json_exceptions'],true) : array();
         $code_examples = ($api_details['json_example_code']!="") ? json_decode($api_details['json_example_code'],true) : array();
+        $related_links = ($api_details['json_links']!="") ? json_decode($api_details['json_links'],true) : array();
+
+
 
 
 
@@ -253,12 +277,16 @@ class ApiDocsController extends Controller {
         $data['paramTypes'] = $paramTypes;
         $data['paramCategories'] = $paramCategories;
 
+        $data['related_links'] = $related_links;
+
         return view("apidoc.edit", $data);
 
     }
 
     private function processApiParamsFromForm($form_data_array)
     {
+
+
         $number_items = count($form_data_array);
         $return_array = array();
 
@@ -267,12 +295,13 @@ class ApiDocsController extends Controller {
         for($a=0;$a<$number_items;$a++)
         {
             $item_array = array();
-            $item_array['name'] = $_POST['param_name'][$a];
-            $item_array['type'] = $_POST['param_type'][$a];
-            $item_array['required'] = $_POST['param_required'][$a];
-            $item_array['desc'] = $_POST['param_description'][$a];
-            $item_array['location'] = $_POST['param_location'][$a];
+            $item_array['name'] = Input::get('param_name')[$a];
+            $item_array['type'] = Input::get('param_type')[$a];
+            $item_array['required'] = Input::get('param_required')[$a];
+            $item_array['desc'] = Input::get('param_description')[$a];
+            $item_array['location'] = Input::get('param_location')[$a];
             $item_array['length'] = "";
+
 
 
             if ($item_array['name']!="") {
@@ -308,6 +337,29 @@ class ApiDocsController extends Controller {
         return $massaged_json_data;
     }
 
+
+    private function processRelatedLinksFromForm($form_data_array)
+    {
+        $number_items = count($form_data_array);
+        $return_array = array();
+
+        if ($number_items==0) { return $return_array; }
+
+        for($a=0;$a<$number_items;$a++)
+        {
+            $item_array = array();
+            $item_array['url'] = addslashes($_POST['related_link'][$a]);
+
+
+            if (rtrim(ltrim($item_array['url']))!="") {
+                $return_array[] = $item_array;
+            }
+        }
+
+        $massaged_json_data = json_encode($return_array);
+        return $massaged_json_data;
+    }
+
     private function processApiCodeExamplesFromForm($form_data_array)
     {
         $number_items = count($form_data_array);
@@ -334,15 +386,16 @@ class ApiDocsController extends Controller {
     public function insert(Request $request)
     {
         $apidoc = new apidoc();
-        $apidoc->name = $_POST['name'];
-        $apidoc->description = $_POST['description'];
-        $apidoc->category = $_POST['category'];
 
-        $apidoc->api_endpoint = $_POST['url_endpoint'];
-        $apidoc->alias = $_POST['alias'];
+        $apidoc->name = Input::get('name','');
+        $apidoc->description = Input::get('description');
+        $apidoc->category = Input::get('category');
 
-        $apidoc->method = $_POST['http_method'];
-        $apidoc->output_format = $_POST['output_type'];
+        $apidoc->api_endpoint = Input::get('url_endpoint');
+        $apidoc->alias = Input::get('alias');
+
+        $apidoc->method = Input::get('http_method');
+        $apidoc->output_format = Input::get('output_type');
         $apidoc->json_example_success = $_POST['json_success'];
         $apidoc->example_call_construct = $_POST['example_call_construct'];
 
@@ -354,6 +407,10 @@ class ApiDocsController extends Controller {
 
         $json_codeexamples = $this->processApiCodeExamplesFromForm($request->input('code_example_code'));
         $apidoc->json_example_code = $json_codeexamples;
+
+        $json_links = $this->processRelatedLinksFromForm($request->input('related_link'));
+        $apidoc->json_links = $json_links;
+
 
 
 
@@ -381,7 +438,9 @@ class ApiDocsController extends Controller {
     public function update(Request $request)
     {
 
-        $api_id = $_POST['api_id'];
+
+
+        $api_id = Input::get('api_id');
         $apidoc = new apidoc();
         //$apidoc = new apidoc();
         $apidoc = $apidoc->find($api_id);
@@ -390,19 +449,19 @@ class ApiDocsController extends Controller {
 
 
 
-        $apidoc->name = $_POST['name'];
-        $apidoc->description = $_POST['description'];
-        $apidoc->category = $_POST['category'];
+        $apidoc->name = Input::get('name');
+        $apidoc->description = Input::get('description');
+        $apidoc->category = Input::get('category');
 
-        $apidoc->api_endpoint = $_POST['url_endpoint'];
-        $apidoc->alias = $_POST['alias'];
+        $apidoc->api_endpoint = Input::get('url_endpoint');
+        $apidoc->alias = Input::get('alias');
 
-        $apidoc->method = $_POST['http_method'];
-        $apidoc->output_format = $_POST['output_type'];
-        $apidoc->json_example_success = $_POST['json_success'];
-        $apidoc->example_call_construct = $_POST['example_call_construct'];
+        $apidoc->method = Input::get('http_method');
+        $apidoc->output_format = Input::get('output_type');
+        $apidoc->json_example_success = Input::get('json_success');
+        $apidoc->example_call_construct = Input::get('example_call_construct');
 
-        $json_api_params = $this->processApiParamsFromForm($_POST['param_name']);
+        $json_api_params = $this->processApiParamsFromForm(Input::get('param_name'));
         $apidoc->json_parameters_needed = $json_api_params;
 
         $json_exceptions = $this->processApiExceptionsFromForm($_POST['exception_name']);
@@ -411,6 +470,8 @@ class ApiDocsController extends Controller {
         $json_codeexamples = $this->processApiCodeExamplesFromForm($request->input('code_example_code'));
         $apidoc->json_example_code = $json_codeexamples;
 
+        $json_links = $this->processRelatedLinksFromForm($request->input('related_link'));
+        $apidoc->json_links = $json_links;
 
 
         try {
@@ -434,6 +495,91 @@ class ApiDocsController extends Controller {
 
 
 
+    }
+
+
+
+    public function run_ws()
+    {
+        $this->middleware('tidy');
+
+        $url = Input::get("url");
+        $method = Input::get("method");
+
+
+
+        $client = new GuzzleClient([
+            'base_uri' => $url,
+            'timeout'  => 5.0,
+        ]);
+
+
+        $x = $client->get('')->getBody()->getContents();
+
+
+
+      $y = $this->indent($x);
+echo $y;
+    }
+
+
+
+    /**
+     * Indents a flat JSON string to make it more human-readable.
+     *
+     * @param string $json The original JSON string to process.
+     *
+     * @return string Indented version of the original JSON string.
+     */
+    function indent($json) {
+
+        $result      = '';
+        $pos         = 0;
+        $strLen      = strlen($json);
+        $indentStr   = '  ';
+        $newLine     = "\n";
+        $prevChar    = '';
+        $outOfQuotes = true;
+
+        for ($i=0; $i<=$strLen; $i++) {
+
+            // Grab the next character in the string.
+            $char = substr($json, $i, 1);
+
+            // Are we inside a quoted string?
+            if ($char == '"' && $prevChar != '\\') {
+                $outOfQuotes = !$outOfQuotes;
+
+                // If this character is the end of an element,
+                // output a new line and indent the next line.
+            } else if(($char == '}' || $char == ']') && $outOfQuotes) {
+                $result .= $newLine;
+                $pos --;
+                for ($j=0; $j<$pos; $j++) {
+                    $result .= $indentStr;
+                }
+            }
+
+            // Add the character to the result string.
+            $result .= $char;
+
+            // If the last character was the beginning of an element,
+            // output a new line and indent the next line.
+            if (($char == ',' || $char == '{' || $char == '[') && $outOfQuotes) {
+                $result .= $newLine;
+                if ($char == '{' || $char == '[') {
+                    $pos ++;
+                }
+
+                for ($j = 0; $j < $pos; $j++) {
+                    $result .= $indentStr;
+                }
+            }
+
+            $prevChar = $char;
+        }
+
+        return $result;
     }
 
 

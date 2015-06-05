@@ -59,6 +59,7 @@ class PagesController extends Controller {
 
         $data = array();
         $data['pages'] = $apiList;
+        $data['type'] = "All";
         return view("pages.list", $data);
     }
 
@@ -70,6 +71,7 @@ class PagesController extends Controller {
 
         $data = array();
         $data['pages'] = $apiList;
+        $data['type'] = $category;
         return view("pages.list", $data);
     }
 

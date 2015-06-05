@@ -32,8 +32,10 @@
 .ws_output
 {
     background-color: #000000;
-    color: #ffdddd;
-    height : 600px;
+    color: #98fb98;
+    height : auto;
+    min-height: 600px;
+
 }
 
 .api_category {
@@ -53,3 +55,26 @@
     color: #D02090;
 }
 
+.no_data {
+    color: #ac2925;
+}
+
+.invisible {
+
+    display: none;
+
+}
+
+.green {
+    color:#3CB371;
+
+}
+
+.red {
+    color:#a94442;
+
+}
+
+.blue {
+    color:#005580;
+}

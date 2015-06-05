@@ -29,7 +29,7 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="/api/dashboard">SF API Documentator</a>
+				<a class="navbar-brand" href="/api/dashboard">SpareDoc</a>
 			</div>
 
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -67,6 +67,7 @@
 
 				</ul>
 
+                <!--
 				<ul class="nav navbar-nav navbar-right">
 					@if (Auth::guest())
 						<li><a href="{{ url('/auth/login') }}">Login</a></li>
@@ -80,6 +81,7 @@
 						</li>
 					@endif
 				</ul>
+				!-->
 			</div>
 		</div>
 	</nav>

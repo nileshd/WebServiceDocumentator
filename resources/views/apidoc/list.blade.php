@@ -24,10 +24,15 @@
 
 <thead>
 <tr>
+    <th data-field="z" data-sortable="true"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"  data-toggle="tooltip" data-placement="top" title="Has example Success Response?"></span></th>
+    <th data-field="a" data-sortable="true"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"  data-toggle="tooltip" data-placement="top" title="Has Consumer Services Client Code?"></span></th>
     <th data-field="category" data-sortable="true">Category</th>
     <th data-field="method" data-sortable="true">Method</th>
     <th data-field="name" data-sortable="true">URL End Point</th>
-    <th data-field="desc" data-sortable="true">Description</th>
+    <th data-field="desc" data-sortable="false">Description</th>
+    <th data-field="x" data-sortable="false"></th>
+    <th data-field="y" data-sortable="false"></th>
+
 
 
 
@@ -65,14 +70,53 @@
 
 
         <tr>
+
+
+            <td>
+
+                <?php
+                if ($api->json_example_success!="") { ?>
+
+                <span class="glyphicon  glyphicon-ok green" ></span>
+
+                <? } else { ?>
+                <span class="glyphicon   glyphicon-remove red"></span>
+
+                <?php } ?>
+
+            </td>
+
+            <td>
+                <?php
+
+                $json_code = $api->json_example_code;
+
+                $code = json_decode($json_code);
+
+                if (count($code) == 0) { ?>
+
+                <span class="glyphicon  glyphicon-remove-circle red" aria-hidden="true"></span>
+
+                <? } else { ?>
+                <span class="glyphicon  glyphicon-ok-circle green" aria-hidden="true"></span>
+
+                <?php } ?>
+
+
+
+            </td>
+
+
             <td>
                 <a href="/api/category/{{$api->category}}">
                     {{$api->category}}
                 </a>
             </td>
+
+
             <td>
 
-                <div class="btn btn-<?php echo $but_type; ?> btn-small"> {{$api->method}}</div>
+                <div class="btn btn-<?php echo $but_type; ?> btn-sm"> {{$api->method}}</div>
 
             </td>
             <td>
@@ -80,14 +124,24 @@
                     <?php echo $api->api_endpoint; ?>
                 </a>
 
-                <a href="/api/edit/{{$api->id}}">(Edit)</a>
-                <a href="/api/run/{{$api->id}}">(Run)</a>
             </td>
 
             <td>
                 <a href="/api/{{$api->id}}">
                     {{$api->name}}
                 </a>
+            </td>
+
+
+
+
+            <td>
+<a href="/api/edit/{{$api->id}}">
+                <span class="glyphicon glyphicon-pencil blue" aria-hidden="true"></span></a>
+            </td>
+            <td>
+                <a href="/api/run/{{$api->id}}">
+                    <span class="glyphicon glyphicon-play blue" aria-hidden="true"></span></a>
             </td>
 
 

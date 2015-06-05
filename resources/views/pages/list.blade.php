@@ -7,7 +7,7 @@
 @endsection
 
 @section('content')
-    <h3>List All Apis</h3>
+    <h3>List {{$type}} Pages</h3>
 
 
 

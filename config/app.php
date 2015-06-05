@@ -146,6 +146,8 @@ return [
 		'App\Providers\EventServiceProvider',
 		'App\Providers\RouteServiceProvider',
 
+        'Artdarek\OAuth\OAuthServiceProvider',
+
 	],
 
 	/*
@@ -193,6 +195,7 @@ return [
 		'URL'       => 'Illuminate\Support\Facades\URL',
 		'Validator' => 'Illuminate\Support\Facades\Validator',
 		'View'      => 'Illuminate\Support\Facades\View',
+        'OAuth' => 'Artdarek\OAuth\Facade\OAuth',
 
 	],
 

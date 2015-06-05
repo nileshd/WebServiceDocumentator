@@ -28,6 +28,15 @@
         });
 
 
+
+        $("#addLinks, .check ").click(function() {
+            $('#mytableLinks tbody>tr:last')
+                    .clone(true)
+                    .insertAfter('#mytableLinks tbody>tr:last').find('input').each(function(){
+                        $(this).val('');
+                    });
+        });
+
     </script>
 @endsection
 @section('css')
@@ -307,6 +316,37 @@
 
 
             <a id="addCodeExamples" name="add_param" class="btn btn-primary">Add More Code Examples</a>
+
+<br><br>
+            <div class="form-group">
+                <h3 class="form_heading">Related Links</h3>
+                <h4>Add related links to this API </h4>
+
+                <table id="mytableLinks" class="table table-condensed">
+
+                    <tbody class="table-striped">
+
+
+                    <tr>
+<td>
+
+                        <input type="text"  placeholder="URL to link" name="related_link[]" class="form-control ">
+
+
+</td>
+
+
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+
+            <a id="addLinks" name="add_param" class="btn btn-primary">Add More Links</a>
+
+
+
 
 
             <!-- Button -->
